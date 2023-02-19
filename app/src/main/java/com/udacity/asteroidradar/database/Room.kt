@@ -1,7 +1,6 @@
 package com.udacity.asteroidradar.database
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.PictureOfDay
@@ -26,15 +25,6 @@ interface PictureOfTheDayDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(image: PictureOfDay)
-
-    @Transaction
-    fun updateData(pic: PictureOfDay) {
-        deleteAll()
-        insert(pic)
-    }
-
-    @Query("DELETE FROM picture_of_the_day_table")
-    fun deleteAll()
 }
 
 @Database(entities = [Asteroid::class , PictureOfDay::class], version = 1)

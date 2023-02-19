@@ -45,7 +45,7 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
                     .fromJson(response)
                     ?: PictureOfDay(-1, "", "image", "")
 
-                database.pictureOfTheDayDao.updateData(image)
+                database.pictureOfTheDayDao.insert(image)
             } catch (e: Exception) {
                 Log.e("repository", e.message.toString())
             }
