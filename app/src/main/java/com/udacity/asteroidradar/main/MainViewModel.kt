@@ -1,12 +1,12 @@
 package com.udacity.asteroidradar.main
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.database.AsteroidDatabase.Companion.getDatabase
 import com.udacity.asteroidradar.repository.AsteroidRepository
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -14,64 +14,76 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val database = getDatabase(application)
     private val repository = AsteroidRepository(database)
 
-    private val allAsteroidList = repository.asteroids
-    private val todayAsteroidList = repository.todayAsteroidList
+    private val _asteroidList = MutableLiveData<List<Asteroid>>()
+    val asteroidList : LiveData<List<Asteroid>>
+    get() = _asteroidList
 
-    private val _asteroidList = MediatorLiveData<List<Asteroid>>()
+    private val _pictureOfDay = MutableLiveData<PictureOfDay>()
+    val pictureOfDay : LiveData<PictureOfDay>
+    get() = _pictureOfDay
 
-    val asteroidList: MutableLiveData<List<Asteroid>>
-        get() = _asteroidList
+    private val _navigateToAsteroidDetails = MutableLiveData<Asteroid>()
 
-    val pictureOfDay = repository.pictureOfDay
-
-    private val _navigateToSelectedAsteroid = MutableLiveData<Asteroid>()
-
-    val navigateToSelectedAsteroid: LiveData<Asteroid>
-        get() = _navigateToSelectedAsteroid
+    val navigateToAsteroidDetails: LiveData<Asteroid>
+        get() = _navigateToAsteroidDetails
 
     init {
-        viewModelScope.launch {
-            repository.refreshAsteroids()
-            repository.getPictureOfTheDay()
-            _asteroidList.addSource(allAsteroidList) {
-                _asteroidList.value = it
+        onViewWeekAsteroidsClicked()
+        try {
+            viewModelScope.launch {
+                repository.refreshAsteroids()
+                repository.getPictureOfTheDay()
+                repository.pictureOfDay.collect {
+                    _pictureOfDay.value = it
+                }
             }
+        }catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     fun onTodayAsteroidsClicked() {
-        removeSource()
-        _asteroidList.addSource(todayAsteroidList) {
-            _asteroidList.value = it
+        try {
+            viewModelScope.launch {
+                repository.todayAsteroidList.collect {
+                    _asteroidList.value = it
+                }
+            }
+        }catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     fun onViewWeekAsteroidsClicked() {
-        removeSource()
-        _asteroidList.addSource(allAsteroidList) {
-            _asteroidList.value = it
+        try {
+            viewModelScope.launch {
+                repository.asteroids.collect {
+                    _asteroidList.value = it
+                }
+            }
+        }catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     fun onSavedAsteroidsClicked() {
-        removeSource()
-        _asteroidList.addSource(allAsteroidList) {
-            _asteroidList.value = it
+        try {
+            viewModelScope.launch {
+                repository.asteroids.collect {
+                    _asteroidList.value = it
+                }
+            }
+        }catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     fun displayAsteroidDetails(asteroid: Asteroid) {
-        _navigateToSelectedAsteroid.value = asteroid
+        _navigateToAsteroidDetails.value = asteroid
     }
-
 
     fun displayAsteroidDetailsComplete() {
-        _navigateToSelectedAsteroid.value = null
-    }
-
-    private fun removeSource() {
-        _asteroidList.removeSource(allAsteroidList)
-        _asteroidList.removeSource(todayAsteroidList)
+        _navigateToAsteroidDetails.value = null
     }
 
 }

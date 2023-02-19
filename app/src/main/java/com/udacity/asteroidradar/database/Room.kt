@@ -5,14 +5,15 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.PictureOfDay
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AsteroidDao {
     @Query("SELECT * FROM asteroid_table ORDER BY date(closeApproachDate) ASC")
-    fun getAllAsteroids(): LiveData<List<Asteroid>>
+    fun getAllAsteroids(): Flow<List<Asteroid>>
 
     @Query("SELECT * FROM asteroid_table WHERE closeApproachDate <=:date ORDER BY date(closeApproachDate) ASC ")
-    fun getTodayAsteroid(date: String): LiveData<List<Asteroid>>
+    fun getAsteroidsByDate(date: String): Flow<List<Asteroid>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(asteroids: List<Asteroid>)
@@ -21,7 +22,7 @@ interface AsteroidDao {
 @Dao
 interface PictureOfTheDayDao {
     @Query("SELECT * FROM picture_of_the_day_table")
-    fun get(): LiveData<PictureOfDay>
+    fun get(): Flow<PictureOfDay>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(image: PictureOfDay)

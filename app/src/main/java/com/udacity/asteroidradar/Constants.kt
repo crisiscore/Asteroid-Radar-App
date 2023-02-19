@@ -9,9 +9,4 @@ object Constants {
     const val BASE_URL = "https://api.nasa.gov/"
     const val API_KEY = "zzEGceoGW5k6aKL7GoqquNK9VmbmZpxB9sLFd0W3"
 
-    fun getCurrentDate(): String {
-        val formatter = SimpleDateFormat("yyyy-MM-dd" , Locale.US)
-        val date = Date()
-        return formatter.format(date)
-    }
 }
