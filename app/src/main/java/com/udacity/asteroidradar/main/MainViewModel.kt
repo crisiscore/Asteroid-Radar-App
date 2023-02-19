@@ -57,7 +57,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun onViewWeekAsteroidsClicked() {
         try {
             viewModelScope.launch {
-                repository.asteroids.collect {
+                repository.weekAsteroidList.collect {
                     _asteroidList.value = it
                 }
             }
@@ -69,7 +69,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun onSavedAsteroidsClicked() {
         try {
             viewModelScope.launch {
-                repository.asteroids.collect {
+                repository.savedAsteroidList.collect {
                     _asteroidList.value = it
                 }
             }

@@ -70,3 +70,12 @@ fun goneIfNotNull(view: View, it: Any?) {
     view.visibility = if (it != null) View.GONE else View.VISIBLE
 }
 
+@BindingAdapter("isPotentiallyHazardousContentDescription")
+fun isPotentiallyHazardousContentDescription(view: ImageView, isPotentiallyHazardous: Boolean) {
+    view.contentDescription = if (isPotentiallyHazardous) {
+        view.context.getString(R.string.potentially_hazardous_asteroid_image)
+    } else {
+        view.context.getString(R.string.not_hazardous_asteroid_image)
+    }
+}
+

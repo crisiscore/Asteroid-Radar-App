@@ -17,3 +17,15 @@ fun getCurrentDate(): String {
     }
     return ""
 }
+
+fun getEndDate(): String {
+    try {
+        val simpleDateFormat = SimpleDateFormat(DateFormat.DATE_FORMAT, Locale.ENGLISH)
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, 7)
+        return simpleDateFormat.format(calendar.time)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return ""
+}

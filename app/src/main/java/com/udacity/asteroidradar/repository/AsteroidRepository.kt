@@ -1,7 +1,6 @@
 package com.udacity.asteroidradar.repository
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import com.squareup.moshi.Moshi
 import com.udacity.asteroidradar.*
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
@@ -14,11 +13,20 @@ import org.json.JSONObject
 
 class AsteroidRepository(private val database: AsteroidDatabase) {
 
-    val asteroids : Flow<List<Asteroid>>
-    get() = database.asteroidDao.getAllAsteroids()
+    val savedAsteroidList: Flow<List<Asteroid>>
+        get() = database.asteroidDao.getAllAsteroids()
 
     val todayAsteroidList: Flow<List<Asteroid>>
-        get() = database.asteroidDao.getAsteroidsByDate(getCurrentDate())
+        get() = database.asteroidDao.getAsteroidsByDate(
+            startDate = getCurrentDate(),
+            endDate = getCurrentDate()
+        )
+
+    val weekAsteroidList: Flow<List<Asteroid>>
+        get() = database.asteroidDao.getAsteroidsByDate(
+            startDate = getCurrentDate(),
+            endDate = getEndDate()
+        )
 
     val pictureOfDay: Flow<PictureOfDay>
         get() = database.pictureOfTheDayDao.get()
@@ -26,7 +34,7 @@ class AsteroidRepository(private val database: AsteroidDatabase) {
     suspend fun refreshAsteroids() {
         withContext(Dispatchers.IO) {
             try {
-                val asteroid = Network.retrofitService.getAsteroids(Constants.API_KEY)
+                val asteroid = Network.retrofitService.getAsteroids(startDate = getCurrentDate() , endDate =  getEndDate(), apiKey = Constants.API_KEY)
                 val data = parseAsteroidsJsonResult(JSONObject(asteroid))
                 database.asteroidDao.insertAll(data)
             } catch (e: Exception) {

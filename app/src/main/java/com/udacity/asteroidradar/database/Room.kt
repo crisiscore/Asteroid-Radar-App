@@ -11,8 +11,8 @@ interface AsteroidDao {
     @Query("SELECT * FROM asteroid_table ORDER BY date(closeApproachDate) ASC")
     fun getAllAsteroids(): Flow<List<Asteroid>>
 
-    @Query("SELECT * FROM asteroid_table WHERE closeApproachDate <=:date ORDER BY date(closeApproachDate) ASC ")
-    fun getAsteroidsByDate(date: String): Flow<List<Asteroid>>
+    @Query("SELECT * FROM asteroid_table WHERE closeApproachDate >= :startDate AND closeApproachDate <= :endDate ORDER BY date(closeApproachDate) ASC ")
+    fun getAsteroidsByDate(startDate: String , endDate : String): Flow<List<Asteroid>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(asteroids: List<Asteroid>)
