@@ -1,0 +1,59 @@
+package com.udacity.asteroidradar.database
+
+import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.PictureOfDay
+
+@Dao
+interface AsteroidDao {
+    @Query("SELECT * FROM asteroid_table ORDER BY date(closeApproachDate) ASC")
+    fun getAllAsteroids(): LiveData<List<Asteroid>>
+
+    @Query("SELECT * FROM asteroid_table WHERE closeApproachDate <=:date ORDER BY date(closeApproachDate) ASC ")
+    fun getTodayAsteroid(date: String): LiveData<List<Asteroid>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(asteroids: List<Asteroid>)
+}
+
+@Dao
+interface PictureOfTheDayDao {
+    @Query("SELECT * FROM picture_of_the_day_table")
+    fun get(): LiveData<PictureOfDay>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(image: PictureOfDay)
+
+    @Transaction
+    fun updateData(pic: PictureOfDay) {
+        deleteAll()
+        insert(pic)
+    }
+
+    @Query("DELETE FROM picture_of_the_day_table")
+    fun deleteAll()
+}
+
+@Database(entities = [Asteroid::class , PictureOfDay::class], version = 1)
+abstract class AsteroidDatabase : RoomDatabase() {
+    abstract val asteroidDao: AsteroidDao
+    abstract val pictureOfTheDayDao: PictureOfTheDayDao
+
+    companion object{
+        private lateinit var INSTANCE: AsteroidDatabase
+
+        fun getDatabase(context: Context): AsteroidDatabase {
+            synchronized(AsteroidDatabase::class.java) {
+                if (!::INSTANCE.isInitialized) {
+                    INSTANCE = Room.databaseBuilder(context.applicationContext,
+                        AsteroidDatabase::class.java,
+                        "asteroids-db").build()
+                }
+            }
+            return INSTANCE
+        }
+    }
+
+}
